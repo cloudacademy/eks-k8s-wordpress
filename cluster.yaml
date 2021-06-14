@@ -1,0 +1,11 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: basic-cluster
+  region: us-west-2
+
+nodeGroups:
+  - name: ng-2
+    instanceType: t2.xlarge
+    desiredCapacity: 1
