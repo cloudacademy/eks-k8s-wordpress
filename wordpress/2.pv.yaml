@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv1
-  namespace: default
+  name: efs-pv
 spec:
-  accessModes:
-  - ReadWriteMany
-  awsElasticBlockStore:
-    fsType: xfs
-    volumeID: aws://us-west-2a/EBS-VOLUME-ID-HERE
   capacity:
     storage: 5Gi
-  persistentVolumeReclaimPolicy: Delete
-  storageClassName: gp2
   volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-7ad1c37d
