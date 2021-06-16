@@ -15,6 +15,8 @@ eksctl utils associate-iam-oidc-provider --cluster <cluster_name> --approve
 
 ## ALB - Install ALB Ingress Controller
 ```
+#https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
+
 curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/iam_policy.json
 
 aws iam create-policy \
@@ -34,6 +36,9 @@ kubectl apply \
  -f https://github.com/jetstack/cert-manager/releases/download/v1.1.1/cert-manager.yaml
 
 curl -o v2_2_0_full.yaml https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/v2_2_0_full.yaml
+
+#update
+#replace your-cluster-name on line 797 in the Deployment spec section of the file with the name of your cluster.
 
 kubectl apply -f v2_2_0_full.yaml
 
@@ -92,7 +97,9 @@ curl -I http://192.168.23.185/index.php
 ```
 
 ```
-kubectl run --rm -it --image=mysql:5.7 --restart=Never mysql-client -- mysql -h $RDS_DATABASE_HOSTNAME m -P 3306 -u admin -p
+kubectl run --rm -it --image=mysql:5.7 --restart=Never mysql-client -- bash
+mysql -h database-1.cluster-cvgfzwfzx0aa.us-west-2.rds.amazonaws.com -P 3306 -u admin -p
+mysql -h database-1.cluster-cvgfzwfzx0aa.us-west-2.rds.amazonaws.com -P 3306 --ssl-ca=aws-ca-bundle.pem --ssl-mode=VERIFY_IDENTITY -u admin -p
 ```
 
 ```
