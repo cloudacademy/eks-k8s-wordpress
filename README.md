@@ -22,9 +22,9 @@ aws iam create-policy \
  --policy-document file://iam_policy.json
 
 eksctl create iamserviceaccount \
- --cluster=my_cluster \
- --namespace=kube-system \
- --name=aws-load-balancer-controller \
+ --cluster basic-cluster \
+ --namespace kube-system \
+ --name aws-load-balancer-controller \
  --attach-policy-arn=arn:aws:iam::111122223333:policy/AWSLoadBalancerControllerIAMPolicy \
  --override-existing-serviceaccounts \
  --approve
@@ -71,13 +71,12 @@ aws iam create-policy \
  --policy-document file://iam-policy-example.json
 
 eksctl create iamserviceaccount \
- --name efs-csi-controller-sa
- --namespace kube-system \
  --cluster basic-cluster \
+ --namespace kube-system \
+ --name efs-csi-controller-sa \ 
  --attach-policy-arn arn:aws:iam::111122223333:policy/EKS_EFS_CSI_Driver_Policy \
- --approve \
  --override-existing-serviceaccounts \
- --region us-west-2
+ --approve
 
 kubectl kustomize "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/ecr?ref=release-1.2" > driver.yaml
 kubectl apply -f driver.yaml
