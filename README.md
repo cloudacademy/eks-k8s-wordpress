@@ -1,19 +1,19 @@
 # eks-k8s-wordpress
 EKS K8s Wordpress Deployment
 
-1. Establish RDS secrets
+## Establish RDS secrets
 
 ```
 RDS_DATABASE_HOSTNAME=database-2.cluster-abcdefg12345.us-west-2.rds.amazonaws.com
 kubectl create secret generic mysql-config --from-literal=host=$RDS_DATABASE_HOSTNAME --from-literal=password=password
 ```
 
-2. Create Cluster OIDC
+## Create Cluster OIDC
 ```
 eksctl utils associate-iam-oidc-provider --cluster <cluster_name> --approve
 ```
 
-3. ALB - Install ALB Ingress Controller
+## ALB - Install ALB Ingress Controller
 ```
 curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/iam_policy.json
 
@@ -40,7 +40,7 @@ kubectl apply -f v2_2_0_full.yaml
 kubectl get deployment -n kube-system aws-load-balancer-controller
 ```
 
-4.1 EFS - Create FileSystem
+## EFS - Create FileSystem
 
 ```
 VPC_ID=$(aws eks describe-cluster --name $CLUSTER_NAME --query "cluster.resourcesVpcConfig.vpcId" --output text)
@@ -60,7 +60,7 @@ aws efs describe-file-systems --query "FileSystems[*].FileSystemId" --output tex
 aws efs describe-mount-targets --file-system-id $FILE_SYSTEM_ID | jq --raw-output '.MountTargets[].LifeCycleState'
 ```
 
-4.2 EFS - Install Driver
+## EFS - Install Driver
 
 ```
 kubectl apply -k https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/deploy/kubernetes/overlays/stable/kustomization.yaml
@@ -82,7 +82,7 @@ kubectl kustomize "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernet
 kubectl apply -f driver.yaml
 ```
 
-Diagnostics
+## Diagnostics
  
 ```
 kubectl get pods -o wide
@@ -107,4 +107,9 @@ nginx -t
 
 ```
 kubectl exec -it wordpress-7df79f95df-f5n62 -c wordpress -- bash
+```
+
+
+```
+tcpdump -i eth0 -s 0 -l -w - dst port 3306 | strings
 ```

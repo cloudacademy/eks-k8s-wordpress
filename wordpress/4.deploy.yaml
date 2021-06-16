@@ -30,6 +30,20 @@ spec:
         - containerPort: 80
       - name: wordpress
         image: wordpress:php8.0-fpm-alpine
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - "bash"
+                - "-c"
+                - |
+                  until [ -f /var/www/html/wp-config.php ]
+                  do
+                  sleep 5
+                  done
+                  #update the wp-config.php
+                  sed -i "86idefine('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL); #k8s.v2" /var/www/html/wp-config.php
+                  exit
         volumeMounts:
         - name: wordpress-persistent-storage
           mountPath: /var/www/html
