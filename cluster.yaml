@@ -2,10 +2,19 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: basic-cluster
+  name: demo-cluster
   region: us-west-2
+
+vpc:
+  cidr: 10.10.0.0/16
+  autoAllocateIPv6: false
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
 
 nodeGroups:
   - name: ng-2
     instanceType: t2.xlarge
     desiredCapacity: 1
+
+availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]    
