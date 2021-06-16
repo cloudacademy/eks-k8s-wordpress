@@ -74,7 +74,7 @@ eksctl create iamserviceaccount \
  --cluster basic-cluster \
  --namespace kube-system \
  --name efs-csi-controller-sa \ 
- --attach-policy-arn arn:aws:iam::111122223333:policy/EKS_EFS_CSI_Driver_Policy \
+ --attach-policy-arn arn:aws:iam::111122223333:policy/AmazonEKS_EFS_CSI_Driver_Policy \
  --override-existing-serviceaccounts \
  --approve
 
