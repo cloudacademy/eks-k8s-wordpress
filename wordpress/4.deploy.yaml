@@ -18,16 +18,6 @@ spec:
         tier: frontend
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.16.1
-        volumeMounts:
-        - name: nginx-proxy-config
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
-        - name: wordpress-persistent-storage
-          mountPath: /var/www/html
-        ports:
-        - containerPort: 80
       - name: wordpress
         image: wordpress:php8.0-fpm-alpine
         lifecycle:
@@ -37,15 +27,15 @@ spec:
                 - "bash"
                 - "-c"
                 - |
-                  until [ -f /var/www/html/wp-config.php ]
-                  do
-                  sleep 5
-                  done
-                  #update the wp-config.php
-                  sed -i "86idefine('MYSQL_CLIENT_FLAGS', MYSQLI_CLIENT_SSL); #k8s.v2" /var/www/html/wp-config.php
-                  exit
+                  chmod 755 /uploads
+                  chown -R www-data:www-data /uploads
+                  mkdir -p /var/www/html/wp-content
+                  ln -sf /uploads /var/www/html/wp-content/uploads
+                  chown -R www-data:www-data /var/www/html/wp-content/uploads
         volumeMounts:
-        - name: wordpress-persistent-storage
+        - name: wordpress-storage2
+          mountPath: /uploads
+        - name: wordpress-storage
           mountPath: /var/www/html
         env:
         - name: WORDPRESS_DB_HOST
@@ -66,10 +56,24 @@ spec:
           value: "wordpress"
         ports:
         - containerPort: 9000
+      - name: nginx
+        image: nginx:1.16.1
+        volumeMounts:
+        - name: nginx-proxy-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: wordpress-storage
+          mountPath: /var/www/html
+        - name: wordpress-storage2
+          mountPath: /uploads
+        ports:
+        - containerPort: 80
       volumes:
       - name: nginx-proxy-config
         configMap:
-          name: nginx-conf      
-      - name: wordpress-persistent-storage
+          name: nginx-conf
+      - name: wordpress-storage
+        emptyDir: {}
+      - name: wordpress-storage2
         persistentVolumeClaim:
           claimName: efs-claim
